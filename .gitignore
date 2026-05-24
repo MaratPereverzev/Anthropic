@@ -1,0 +1,8 @@
+# Runtime Claude/Cursor config dumps — not source of truth
+global/
+local/
+
+# OS / editor
+.DS_Store
+*.swp
+*.swo
