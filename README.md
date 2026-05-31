@@ -1,9 +1,9 @@
-# anthropic-skills
+# Skills
 
 Curated [Agent Skills](https://agentskills.io) for AI coding agents. Each skill is a folder with a `SKILL.md` file — the same format works across Claude Code, Cursor, Codex, Gemini CLI, and Windsurf.
 
 ```
-skills/
+.agents/skills/
   git-commit/
     SKILL.md
   grill-me/
@@ -18,26 +18,28 @@ Copy or symlink a skill folder into your agent's skills directory. The internal 
 **Global** (available in every project):
 
 ```bash
-ln -s /path/to/anthropic-skills/skills/git-commit ~/.claude/skills/git-commit
-ln -s /path/to/anthropic-skills/skills/git-commit ~/.cursor/skills/git-commit
-ln -s /path/to/anthropic-skills/skills/git-commit ~/.agents/skills/git-commit
+ln -s /path/to/anthropic-skills/.agents/skills/git-commit ~/.claude/skills/git-commit
+ln -s /path/to/anthropic-skills/.agents/skills/git-commit ~/.cursor/skills/git-commit
+ln -s /path/to/anthropic-skills/.agents/skills/git-commit ~/.agents/skills/git-commit
 ```
 
 **Project** (shared via git with your team):
 
 ```bash
-ln -s /path/to/anthropic-skills/skills/claude-md .claude/skills/claude-md
+ln -s /path/to/anthropic-skills/.agents/skills/claude-md .claude/skills/claude-md
 ```
 
 ### Where each agent looks
 
-| Agent | Global | Project |
-|-------|--------|---------|
-| Claude Code | `~/.claude/skills/` | `.claude/skills/` |
-| Cursor | `~/.cursor/skills/` | `.cursor/skills/` |
-| OpenAI Codex | `~/.agents/skills/` | `.agents/skills/` |
-| Gemini CLI | `~/.gemini/skills/` | `.gemini/skills/` |
-| Windsurf | `~/.codeium/windsurf/skills/` | `.windsurf/skills/` |
+
+| Agent        | Global                        | Project             |
+| ------------ | ----------------------------- | ------------------- |
+| Claude Code  | `~/.claude/skills/`           | `.claude/skills/`   |
+| Cursor       | `~/.cursor/skills/`           | `.cursor/skills/`   |
+| OpenAI Codex | `~/.agents/skills/`           | `.agents/skills/`   |
+| Gemini CLI   | `~/.gemini/skills/`           | `.gemini/skills/`   |
+| Windsurf     | `~/.codeium/windsurf/skills/` | `.windsurf/skills/` |
+
 
 Codex, Gemini, and Windsurf also discover `.agents/skills/` as a cross-agent alias.
 
@@ -45,124 +47,101 @@ Codex, Gemini, and Windsurf also discover `.agents/skills/` as a cross-agent ali
 
 ## Skills
 
-### [`git-commit`](skills/git-commit/) — global
+### Git & commits
 
-Turns a messy working tree into one or more clean, logically grouped commits — with human approval at every step.
 
-**Triggers:** "commit", "commit this", "save my changes", "create a commit"
+| Skill                                                                      | What it does                                                                                                                | Triggers                                      |
+| -------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| `[git-commit](.agents/skills/git-commit/)`                                 | Groups a messy working tree into logical, dependency-ordered commits with tag-grouped messages and approval at each step.   | "commit", "save my changes"                   |
+| `[git-guardrails-claude-code](.agents/skills/git-guardrails-claude-code/)` | Sets up Claude Code hooks that block dangerous git commands (`push`, `reset --hard`, `clean`, `branch -D`) before they run. | "block dangerous git", "add git safety hooks" |
 
-**What it does:**
 
-1. Gathers git context (`status`, diffs, branch, recent log)
-2. Inventories all staged, unstaged, and untracked changes
-3. Groups files into 1–4 logical commits (feature + tests + migrations together, refactors separate, etc.)
-4. Tags each change (`Add`, `Refactor`, `Hotfix`, `Fix`, `Docs`, `Chore`, …)
-5. Orders commits by dependency so each applies cleanly
-6. Runs formatters/linters once up-front (pre-commit, ruff, prettier, eslint, …) to avoid per-commit hook loops
-7. Commits each group one at a time — presenting the exact message and file list for approval before every commit
+### Planning, specs & issues
 
-**Commit message format:**
 
-```
-Add:
-- new endpoint for user preferences
-- migration for preferences table
+| Skill                                                            | What it does                                                                                              | Triggers                             |
+| ---------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | ------------------------------------ |
+| `[grill-me](.agents/skills/grill-me/)`                           | Stress-tests a plan through relentless Q&A, resolving each branch of the decision tree.                   | "grill me", stress-test a plan       |
+| `[grill-with-docs](.agents/skills/grill-with-docs/)`             | Grills a plan against the project's domain model, sharpening terms and updating CONTEXT.md / ADRs inline. | stress-test against docs             |
+| `[to-prd](.agents/skills/to-prd/)`                               | Turns the current conversation into a PRD and publishes it to the issue tracker.                          | "create a PRD"                       |
+| `[to-issues](.agents/skills/to-issues/)`                         | Breaks a plan or PRD into independently-grabbable issues using tracer-bullet vertical slices.             | "break this into issues"             |
+| `[request-refactor-plan](.agents/skills/request-refactor-plan/)` | Builds a refactor plan of tiny commits via interview, then files it as a GitHub issue.                    | "plan a refactor", "refactoring RFC" |
+| `[triage](.agents/skills/triage/)`                               | Triages issues through a role-driven state machine, prepping them for an AFK agent.                       | "triage issues", "create an issue"   |
+| `[qa](.agents/skills/qa/)`                                       | Conversational QA session — you report bugs, it explores the code and files GitHub issues.                | "QA session", "report bugs"          |
 
-Refactor:
-- extract validation helper from controller
-```
 
-**Safety rails:** warns on detached HEAD and default-branch commits, never auto-stages secrets (`.env`, keys, credentials), never uses `git add -A` or `git add -p`.
+### Code quality & dev workflow
 
----
 
-### [`grill-me`](skills/grill-me/) — global
+| Skill                                                                            | What it does                                                                                              | Triggers                                  |
+| -------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
+| `[tdd](.agents/skills/tdd/)`                                                     | Test-driven development with a strict red-green-refactor loop.                                            | "TDD", "red-green-refactor", "test-first" |
+| `[diagnose](.agents/skills/diagnose/)`                                           | Disciplined debugging loop: reproduce → minimise → hypothesise → instrument → fix → regression-test.      | "diagnose this", "it's broken/failing"    |
+| `[review](.agents/skills/review/)`                                               | Reviews changes since a ref along two axes — Standards and Spec — in parallel sub-agents.                 | "review this branch/PR"                   |
+| `[improve-codebase-architecture](.agents/skills/improve-codebase-architecture/)` | Finds deepening opportunities to make a codebase more testable and AI-navigable.                          | "improve architecture", "find refactors"  |
+| `[setup-pre-commit](.agents/skills/setup-pre-commit/)`                           | Sets up Husky pre-commit hooks with lint-staged, type checking, and tests.                                | "add pre-commit hooks", "set up Husky"    |
+| `[prototype](.agents/skills/prototype/)`                                         | Builds a throwaway prototype — runnable terminal app or toggleable UI variations — to flesh out a design. | "prototype this", "let me play with it"   |
+| `[design-an-interface](.agents/skills/design-an-interface/)`                     | Generates radically different interface designs for a module via parallel sub-agents.                     | "design an API", "design it twice"        |
+| `[frontend-design](.agents/skills/frontend-design/)`                             | Produces distinctive, production-grade frontend UI that avoids generic AI aesthetics.                     | "build a component/page/app"              |
 
-Stress-tests a plan or design through relentless Q&A until every decision is resolved.
 
-**Triggers:** "grill me", stress-test a plan, review a design before building
+### Docs & context
 
-**What it does:**
 
-- Walks down each branch of the design decision tree one by one
-- Resolves dependencies between decisions before moving on
-- Provides a recommended answer with every question
-- Explores the codebase when a question can be answered from code instead of asking you
+| Skill                                                        | What it does                                                                                  | Triggers                                  |
+| ------------------------------------------------------------ | --------------------------------------------------------------------------------------------- | ----------------------------------------- |
+| `[claude-md](.agents/skills/claude-md/)`                     | Creates, updates, or audits `CLAUDE.md` — the onboarding doc Claude Code loads every session. | create/update CLAUDE.md                   |
+| `[convert-to-md](.agents/skills/convert-to-md/)`             | Decomposes any file into a dense, Claude-optimized Markdown document.                         | "convert-to-md ", "break this down"       |
+| `[ubiquitous-language](.agents/skills/ubiquitous-language/)` | Extracts a DDD glossary from the conversation into `UBIQUITOUS_LANGUAGE.md`.                  | "build a glossary", "domain model", "DDD" |
+| `[handoff](.agents/skills/handoff/)`                         | Compacts the current conversation into a handoff document for the next agent.                 | "hand off", "compact this session"        |
+| `[zoom-out](.agents/skills/zoom-out/)`                       | Steps back to give higher-level context on how code fits the bigger picture.                  | "zoom out"                                |
+| `[teach](.agents/skills/teach/)`                             | Teaches a new skill or concept within the current workspace.                                  | "teach me about…"                         |
 
-Best used before starting non-trivial work — architecture choices, feature specs, migration plans.
 
----
+### Writing
 
-### [`convert-to-md`](skills/convert-to-md/) — global
 
-Converts any file into a dense, Claude-optimized Markdown document for future agent sessions.
+| Skill                                                    | What it does                                                                                       | Triggers                                   |
+| -------------------------------------------------------- | -------------------------------------------------------------------------------------------------- | ------------------------------------------ |
+| `[writing-fragments](.agents/skills/writing-fragments/)` | Mines you for fragments — claims, vignettes, half-thoughts — as raw material for a future article. | "fragments", "ideate", "raw material"      |
+| `[writing-shape](.agents/skills/writing-shape/)`         | Shapes a pile of raw notes into a publishable article, paragraph by paragraph.                     | "shape this", "turn notes into an article" |
 
-**Triggers:** `convert-to-md <file>`, "analyze and convert", "break this down into a .md"
 
-**What it does:**
+### Claude Code authoring (plugins, skills, hooks, MCP)
 
-1. **Ingest** — reads the entire file; detects type (prose, source code, DB schema, config, existing `.md`)
-2. **Decompose** — builds a topic map ranked by discussion weight
-3. **Extract** — pulls out Core Idea, Architecture, Key Components, DB Schema (with full column tables), File References, and verbatim IMPORTANT/WARNING/TODO flags
-4. **Write** — outputs `<filename>.md` next to the source with a structured skeleton
-5. **Verify** — checks all topics, references, and flags are captured
 
-**Output conventions:**
+| Skill                                                            | What it does                                                                                   | Triggers                                       |
+| ---------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- | ---------------------------------------------- |
+| `[write-a-skill](.agents/skills/write-a-skill/)`                 | Creates new agent skills with proper structure, progressive disclosure, and bundled resources. | "create a skill"                               |
+| `[skill-development](.agents/skills/skill-development/)`         | Reference guidance on skill structure and best practices.                                      | "improve skill description", "skill structure" |
+| `[plugin-structure](.agents/skills/plugin-structure/)`           | Scaffolds and organizes Claude Code plugins (`plugin.json`, components, auto-discovery).       | "create a plugin", "plugin structure"          |
+| `[plugin-settings](.agents/skills/plugin-settings/)`             | Documents the `.claude/plugin-name.local.md` pattern for per-project plugin config.            | "plugin settings", "store plugin config"       |
+| `[hook-development](.agents/skills/hook-development/)`           | Guidance for creating Claude Code hooks (PreToolUse, Stop, SessionStart, …).                   | "create a hook", "validate tool use"           |
+| `[writing-hookify-rules](.agents/skills/writing-hookify-rules/)` | Helps write hookify rules and understand their syntax.                                         | "create a hookify rule"                        |
+| `[mcp-integration](.agents/skills/mcp-integration/)`             | Integrates MCP servers (SSE, stdio, HTTP, WebSocket) into a plugin via `.mcp.json`.            | "add MCP server", "set up MCP"                 |
 
-- Uses `@path/to/file.md` references (repo-relative, `.md` only, one per line)
-- DB schemas get full attribute tables — no prose summaries
-- IMPORTANT flags are quoted verbatim, never paraphrased
-- Audit-and-fix mode when the input is already `.md`
 
-The output is optimized for a *future Claude*, not human readability — density over decoration.
+### Integrations & meta
 
----
 
-### [`claude-md`](skills/claude-md/) — project
+| Skill                                              | What it does                                                                             | Triggers                     |
+| -------------------------------------------------- | ---------------------------------------------------------------------------------------- | ---------------------------- |
+| `[obsidian-vault](.agents/skills/obsidian-vault/)` | Searches, creates, and manages Obsidian notes with wikilinks and index notes.            | "find/create/organize notes" |
+| `[caveman-stats](.agents/skills/caveman-stats/)`   | Shows real token usage and estimated savings for the session, read from the session log. | `/caveman-stats`             |
 
-Creates, updates, or audits `CLAUDE.md` — the primary onboarding document that Claude Code loads in every session.
-
-**Triggers:** create/update/audit CLAUDE.md, set up agent context for a repo
-
-**Modes:**
-
-| Mode | Behavior |
-|------|----------|
-| `create` | Analyze the project and draft a new CLAUDE.md |
-| `update` | Audit existing CLAUDE.md and improve it |
-| `audit` | Report on quality without modifying the file |
-
-**What a good CLAUDE.md contains:**
-
-- **WHAT** — tech stack, project structure, key directories
-- **WHY** — purpose, architectural decisions, component responsibilities
-- **HOW** — dev commands (install, test, build), critical gotchas
-- **Claude Resources** — `@` references to every `.claude/skills/`, `.claude/docs/`, and settings file with one-line descriptions
-
-**Golden rules enforced by the skill:**
-
-- Under 300 lines (ideally under 100)
-- Only universally-applicable info — no task-specific instructions
-- No style/lint rules (use deterministic tools instead)
-- No code snippets (use `file:line` references)
-- Progressive disclosure via `agent_docs/` for larger projects
-
-Install this one per-repo — it reads your project's structure, `.claude/` directory, and existing docs.
 
 ---
 
 ## Adding a skill
 
-1. Create `skills/<skill-name>/SKILL.md` with YAML frontmatter:
-
-   ```yaml
+1. Create `.agents/skills/<skill-name>/SKILL.md` with YAML frontmatter:
+  ```yaml
    ---
    name: my-skill
    description: What it does and when to use it. Include trigger phrases.
    ---
-   ```
-
-2. Add a section to this README
+  ```
+2. Add a row to the table above
 3. Symlink into the agent directory you use
 
 See [Claude Code skills docs](https://code.claude.com/docs/en/skills) for authoring guidance.
